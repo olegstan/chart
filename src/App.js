@@ -47,6 +47,8 @@ class App extends React.Component {
                     this.setState({
                         charts: charts
                     });
+                }else{
+                    alert('Ошибка загрузки данных');
                 }
             });
     }
