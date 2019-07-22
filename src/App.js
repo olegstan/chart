@@ -9,16 +9,19 @@ class App extends React.Component {
 
         this.state = {
             charts: [],
+            maxHeight: 0
         };
         this.params = {
             symbol: 'ETH/BTC',
             resolution: 15,
             from: moment(new Date(2019, 2, 1, 0, 0, 0, 0)),
             to: moment(),
+            maxHeight: 0,
         };
     }
 
-    loadData() {
+    loadData()
+    {
         fetch('https://api.nacdaq.pro/plot/history?symbol=' + this.params.symbol + '&resolution=' + this.params.resolution + '&from=' + this.params.from.unix() + '&to=' + this.params.to.unix())
             .then((response) => {
                 return response.json();
@@ -27,7 +30,14 @@ class App extends React.Component {
                 if (json.s === 'ok') {
                     let count = json.c.length;
                     let charts = this.state.charts;
-                    for (var i = 0; i < count; i++) {
+                    let maxHeight = this.state.maxHeight;
+                    for (var i = 0; i < count; i++)
+                    {
+                        if(maxHeight < json.v[i])
+                        {
+                            maxHeight = json.v[i];
+                        }
+
 
                         let key = charts.findIndex((obj, index, array) => {
                             return obj.time === json.t[i];
@@ -35,17 +45,18 @@ class App extends React.Component {
 
                         if (key === -1) {
                             charts.push({
-                                time: json.t[i], open: json.o[i], high: json.h[i], low: json.l[i], close: json.c[i]
+                                time: json.t[i], open: json.o[i], high: json.h[i], low: json.l[i], close: json.c[i], value: json.v[i]
                             });
                         } else {
                             charts[key] = {
-                                time: json.t[i], open: json.o[i], high: json.h[i], low: json.l[i], close: json.c[i]
+                                time: json.t[i], open: json.o[i], high: json.h[i], low: json.l[i], close: json.c[i], value: json.v[i]
                             };
                         }
                     }
 
                     this.setState({
-                        charts: charts
+                        charts: charts,
+                        maxHeight: maxHeight
                     });
                 }
             });
@@ -70,21 +81,11 @@ class App extends React.Component {
                 style={{
                     backgroundColor: item.open > item.close ? 'red' : 'green',
                     display: 'inline-block',
-                    width: '100px',
-                    border: '1px solid #000',
-                    margin: '10px',
-                    minHeight: '100px'
-                }}
-                title={'Цена открытия:' + item.low + '\n' + 'Цена закрытия: ' + item.high}>
-                <div style={{
-                    height: '50px',
-                    display: 'flex',
-                }} >{item.high}</div>
-                <div style={{
-                    height: '50px',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                }} >{item.low}</div>
+                    width: '3px',
+                    margin: '1px',
+                    minHeight: '100px',
+                    height: (item.value * 3) + 'px'
+                }}>
             </div>
         })
     }
@@ -93,8 +94,8 @@ class App extends React.Component {
         return (<div style={{
             whiteSpace: 'nowrap',
             width: window.outerWidth + 'px',
+            height: '800px',
             overflowX: 'auto',
-            height: '150px'
         }}>
             {this.renderCharts()}
         </div>);
