@@ -58,6 +58,8 @@ class App extends React.Component {
                         charts: charts,
                         maxHeight: maxHeight
                     });
+                }else{
+                    alert('Ошибка загрузки');
                 }
             });
     }
@@ -78,12 +80,12 @@ class App extends React.Component {
         return this.state.charts.map((item, key) => {
             return <div
                 key={key}
+                dataValue={item.value}
                 style={{
                     backgroundColor: item.open > item.close ? 'red' : 'green',
                     display: 'inline-block',
                     width: '3px',
                     margin: '1px',
-                    minHeight: '100px',
                     height: (item.value * 3) + 'px'
                 }}>
             </div>
